@@ -1,0 +1,15 @@
+node_modules
+.next
+.env*
+!.env.example
+.pglite
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.DS_Store
+# Old version and any spreadsheets stay out of the (public) repository
+legacy
+*.xlsx
+*.xls
+*.csv
+.claude

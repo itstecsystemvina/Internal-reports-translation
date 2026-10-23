@@ -1,0 +1,41 @@
+{
+  "name": "bccv-app",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --import tsx scripts/migrate.ts && next dev",
+    "build": "next build",
+    "vercel-build": "node --import tsx scripts/migrate.ts && next build",
+    "start": "next start",
+    "lint": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --import tsx scripts/migrate.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.11",
+    "@google/genai": "^2.31.0",
+    "@neondatabase/serverless": "^1.2.0",
+    "bcryptjs": "^3.0.3",
+    "docx": "^9.14.0",
+    "drizzle-orm": "^0.45.4",
+    "exceljs": "^4.4.0",
+    "jose": "^6.2.13",
+    "lucide-react": "^1.61.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
