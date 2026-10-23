@@ -14,6 +14,9 @@ import { DeadlineText } from "@/components/deadline";
 import { Lamp } from "@/components/traffic-light";
 
 const WEEKS_SHOWN = 6;
+const WEEKS_ON_PHONE = 2;
+// Older columns are hidden on phones so the selected week stays in view.
+const older = (i: number) => i < WEEKS_SHOWN - WEEKS_ON_PHONE && "hidden sm:table-cell";
 
 export default async function TrackerPage({ searchParams }: PageProps<"/admin">) {
   await requireAdmin();
@@ -82,16 +85,16 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
         </p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-          <table className="w-full min-w-[640px] border-collapse text-sm">
+          <table className="w-full border-collapse text-sm sm:min-w-[640px]">
             <thead>
               <tr className="border-b border-line">
                 <th className="sticky left-0 z-10 bg-surface px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-faint">
                   Nhân viên
                 </th>
-                {weeks.map((w) => {
+                {weeks.map((w, i) => {
                   const due = dayInWeek(w, deadline.dueDay);
                   return (
-                    <th key={w} className={cn("px-2 py-3 text-center font-normal", w === week && "bg-brand-soft")}>
+                    <th key={w} className={cn("px-2 py-3 text-center font-normal", w === week && "bg-brand-soft", older(i))}>
                       <Link href={`/admin?week=${w}`} className="block leading-tight hover:text-brand">
                         <div className={cn("text-sm font-semibold tabular-nums", w === week ? "text-brand" : "text-ink")}>
                           {WEEKDAYS_VI[deadline.dueDay].replace("Thứ ", "T")} {shortDate(due)}
@@ -110,11 +113,11 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                     <div className="max-w-[220px] truncate font-medium">{p.name}</div>
                     {p.department && <div className="text-xs text-faint">{p.department}</div>}
                   </td>
-                  {weeks.map((w) => {
+                  {weeks.map((w, i) => {
                     const r = byKey.get(`${p.id}|${w}`);
                     // Weeks that ended before this person's account existed are not counted.
                     if (!r && addWeeks(w, 1) <= todayVN(p.createdAt)) {
-                      return <td key={w} className={cn("px-2 py-2 text-center text-faint", w === week && "bg-brand-soft/50")}>·</td>;
+                      return <td key={w} className={cn("px-2 py-2 text-center text-faint", w === week && "bg-brand-soft/50", older(i))}>·</td>;
                     }
                     const inner = (
                       <>
@@ -125,7 +128,7 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                       </>
                     );
                     return (
-                      <td key={w} className={cn("px-2 py-2 text-center", w === week && "bg-brand-soft/50")}>
+                      <td key={w} className={cn("px-2 py-2 text-center", w === week && "bg-brand-soft/50", older(i))}>
                         {r ? (
                           <Link
                             href={`/admin/reports/${r.id}`}
@@ -146,8 +149,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
             <tfoot>
               <tr className="border-t border-line text-xs text-muted">
                 <td className="sticky left-0 z-10 bg-surface px-4 py-2.5">Đã nộp</td>
-                {weeks.map((w) => (
-                  <td key={w} className={cn("px-2 py-2.5 text-center tabular-nums", w === week && "bg-brand-soft/50 font-semibold text-brand")}>
+                {weeks.map((w, i) => (
+                  <td key={w} className={cn("px-2 py-2.5 text-center tabular-nums", w === week && "bg-brand-soft/50 font-semibold text-brand", older(i))}>
                     {people.filter((p) => byKey.has(`${p.id}|${w}`)).length}/{people.filter((p) => byKey.has(`${p.id}|${w}`) || addWeeks(w, 1) > todayVN(p.createdAt)).length}
                   </td>
                 ))}

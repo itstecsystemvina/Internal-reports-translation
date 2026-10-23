@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const ADMIN = [
@@ -22,13 +23,13 @@ export function Nav({ isAdmin }: { isAdmin: boolean }) {
     href === "/admin" ? pathname === "/admin" || pathname.startsWith("/admin/reports") : pathname.startsWith(href);
 
   return (
-    <nav className="-mb-px flex gap-5 overflow-x-auto [scrollbar-width:none]">
+    <nav className="-mb-px flex gap-4 overflow-x-auto [scrollbar-width:none] sm:gap-5">
       {items.map(({ href, label }) => (
         <Link
           key={href}
           href={href}
           className={cn(
-            "shrink-0 border-b-2 py-3.5 text-sm transition",
+            "shrink-0 border-b-2 py-3.5 text-[13px] transition sm:text-sm",
             isActive(href) ? "border-brand font-semibold text-ink" : "border-transparent text-muted hover:text-ink",
           )}
         >
@@ -54,9 +55,8 @@ export function ThemeToggle() {
         } catch {}
       }}
     >
-      <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" />
-      </svg>
+      <Moon className="size-4 dark:hidden" />
+      <Sun className="hidden size-4 dark:block" />
     </button>
   );
 }

@@ -8,16 +8,16 @@
   --color-sunken: #f7f9fa;
   --color-ink: #14212b;
   --color-muted: #5b6b78;
-  --color-faint: #8a98a3;
+  --color-faint: #62717c;
   --color-line: #dce3e8;
   --color-brand: #0f4c5c;
   --color-brand-ink: #ffffff;
   --color-brand-soft: #e1eef1;
-  --color-go: #17a652;
+  --color-go: #127f40;
   --color-go-soft: #e3f6ea;
-  --color-stop: #e0393c;
+  --color-stop: #c62a2d;
   --color-stop-soft: #fde8e8;
-  --color-wait: #d99511;
+  --color-wait: #94600a;
   --color-wait-soft: #fdf3dd;
   --color-housing: #1b2329;
 
@@ -32,13 +32,16 @@
   --color-sunken: #10171c;
   --color-ink: #e4ebf0;
   --color-muted: #93a3af;
-  --color-faint: #66757f;
+  --color-faint: #8494a0;
   --color-line: #253139;
   --color-brand: #5cb8cc;
   --color-brand-ink: #071a20;
   --color-brand-soft: #14313a;
+  --color-go: #3cc977;
   --color-go-soft: #0f2f1e;
+  --color-stop: #ff6b6b;
   --color-stop-soft: #3a1617;
+  --color-wait: #e8ab3a;
   --color-wait-soft: #3a2c0c;
   --color-housing: #0a0f12;
   color-scheme: dark;
@@ -54,6 +57,25 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
+}
+
+/* Tailwind v4 leaves buttons with the default arrow cursor. */
+button:not(:disabled),
+select:not(:disabled),
+summary,
+label:has(> input[type="checkbox"]),
+input[type="range"] {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Traffic light lamps ───────────────────────────── */

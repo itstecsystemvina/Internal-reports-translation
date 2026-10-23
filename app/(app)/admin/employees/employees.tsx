@@ -103,7 +103,7 @@ export function Employees({ rows, meId, defaultPassword }: { rows: Row[]; meId: 
                   <div className="font-medium">{r.name} {!r.active && <Badge className="ml-1">Đã khoá</Badge>}</div>
                   <div className="text-xs text-muted">{r.email}</div>
                 </td>
-                <td className="px-3 py-2 text-muted">
+                <td className="min-w-40 px-3 py-2 text-muted">
                   {r.department || "—"}
                   {r.position && <div className="text-xs text-faint">{r.position}</div>}
                 </td>
