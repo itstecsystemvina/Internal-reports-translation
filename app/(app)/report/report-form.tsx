@@ -10,7 +10,7 @@ import { Button } from "@/components/ui";
 import type { AppSettings } from "@/lib/defaults";
 import type { ReportContent } from "@/lib/types";
 import { DeadlineText } from "@/components/deadline";
-import { formatSubmitted } from "@/lib/week";
+import { deadlineAt, formatSubmitted } from "@/lib/week";
 import { hasInvalidDate } from "@/lib/day-month";
 
 export function ReportForm({
@@ -33,6 +33,7 @@ export function ReportForm({
   const [updatedAt, setUpdatedAt] = useState(initialUpdated);
   const [pending, start] = useTransition();
   const submitted = !!submittedAt;
+  const late = submitted && new Date(submittedAt!) > deadlineAt(week, deadline.dueDay, deadline.dueTime);
 
   const save = () => {
     if (hasInvalidDate(draft)) return void toast.error("Có ngày chưa đúng định dạng DD/MM (ô viền đỏ).");
@@ -52,9 +53,9 @@ export function ReportForm({
   return (
     <div className="pb-24">
       <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-semibold ${submitted ? "bg-go-soft text-go" : "bg-stop-soft text-stop"}`}>
-          <Lamp on={submitted} />
-          {submitted ? `Đã nộp · ${formatSubmitted(submittedAt!)}` : "Chưa nộp"}
+        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-semibold ${!submitted ? "bg-stop-soft text-stop" : late ? "bg-wait-soft text-wait" : "bg-go-soft text-go"}`}>
+          <Lamp status={!submitted ? "missing" : late ? "late" : "on-time"} />
+          {submitted ? `${late ? "Nộp trễ" : "Đã nộp"} · ${formatSubmitted(submittedAt!)}` : "Chưa nộp"}
         </span>
         <span className="text-muted">
           {submitted && updatedAt && updatedAt !== submittedAt ? (

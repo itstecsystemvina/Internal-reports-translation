@@ -23,6 +23,7 @@
   --color-stop-dot: #ff3b30;
   --color-wait: #b25000;
   --color-wait-soft: #fff3e3;
+  --color-wait-dot: #ff9500;
 
   --font-display: var(--font-montserrat), var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-montserrat), var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
@@ -52,6 +53,7 @@
   --color-stop-dot: #ff453a;
   --color-wait: #ff9f0a;
   --color-wait-soft: #3a2606;
+  --color-wait-dot: #ff9f0a;
   color-scheme: dark;
 }
 

@@ -4,7 +4,8 @@ import { eq } from "drizzle-orm";
 import { ArrowLeft } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
-import { formatSubmitted, weekNumber, weekRangeLabel } from "@/lib/week";
+import { deadlineAt, formatSubmitted, weekNumber, weekRangeLabel } from "@/lib/week";
+import { getSettings } from "@/lib/settings";
 import { Review } from "./review";
 
 export default async function ReportPage({ params }: PageProps<"/admin/reports/[id]">) {
@@ -19,6 +20,8 @@ export default async function ReportPage({ params }: PageProps<"/admin/reports/[
     .where(eq(schema.reports.id, id));
   if (!row) notFound();
   const r = row.report;
+  const { deadline } = await getSettings();
+  const late = r.submittedAt > deadlineAt(r.weekStart, deadline.dueDay, deadline.dueTime);
 
   return (
     <>
@@ -31,8 +34,8 @@ export default async function ReportPage({ params }: PageProps<"/admin/reports/[
           <div className="mt-0.5 text-sm text-muted">
             {[row.department, row.email].filter(Boolean).join(" · ")} — Tuần {weekNumber(r.weekStart)} ({weekRangeLabel(r.weekStart)})
           </div>
-          <div className="mt-0.5 text-sm text-go">
-            Nộp {formatSubmitted(r.submittedAt)}
+          <div className={`mt-0.5 text-sm ${late ? "text-wait" : "text-go"}`}>
+            {late ? "Nộp trễ" : "Nộp"} {formatSubmitted(r.submittedAt)}
             {r.updatedAt.getTime() !== r.submittedAt.getTime() && (
               <span className="text-muted"> · cập nhật {formatSubmitted(r.updatedAt)}</span>
             )}

@@ -6,12 +6,12 @@ import { db, schema } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { cn } from "@/lib/cn";
 import {
-  WEEKDAYS_VI, addWeeks, currentWeekStart, dayInWeek, formatSubmitted, isValidWeekStart, shortDate, todayVN, weekNumber,
+  WEEKDAYS_VI, addWeeks, currentWeekStart, dayInWeek, deadlineAt, formatSubmitted, isValidWeekStart, shortDate, todayVN, weekNumber,
 } from "@/lib/week";
 import { PageHeader, buttonClass } from "@/components/ui";
 import { WeekNav } from "@/components/week-nav";
 import { DeadlineText } from "@/components/deadline";
-import { Lamp } from "@/components/traffic-light";
+import { Lamp, type SubmitStatus } from "@/components/traffic-light";
 
 const WEEKS_SHOWN = 6;
 const WEEKS_ON_PHONE = 2;
@@ -50,6 +50,11 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
   const selected = people.map((p) => byKey.get(`${p.id}|${week}`)).filter(Boolean);
   const untranslated = selected.filter((r) => r!.translationStatus !== "done").length;
 
+  // Late = first submitted after that week's deadline. Late reports still count as submitted.
+  const dueAt = new Map(weeks.map((w) => [w, deadlineAt(w, deadline.dueDay, deadline.dueTime)]));
+  const isLate = (r: { weekStart: string; submittedAt: Date }) => r.submittedAt > dueAt.get(r.weekStart)!;
+  const lateCount = selected.filter((r) => isLate(r!)).length;
+
   return (
     <>
       <PageHeader
@@ -64,6 +69,20 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
             {selected.length}/{people.length}
           </span>{" "}
           đã nộp tuần {weekNumber(week)}
+          {lateCount > 0 && <span className="font-medium text-wait"> · {lateCount} nộp trễ</span>}
+          <span className="mt-1 flex flex-wrap gap-x-3 text-xs">
+            {(
+              [
+                ["on-time", "Đúng hạn"],
+                ["late", "Trễ hạn"],
+                ["missing", "Chưa nộp"],
+              ] as [SubmitStatus, string][]
+            ).map(([s, label]) => (
+              <span key={s} className="inline-flex items-center gap-1.5">
+                <Lamp status={s} className="size-2" /> {label}
+              </span>
+            ))}
+          </span>
         </div>
         {selected.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
@@ -121,8 +140,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                     }
                     const inner = (
                       <>
-                        <Lamp on={!!r} />
-                        <span className={cn("text-[11px] tabular-nums", r ? "text-muted" : "text-faint")}>
+                        <Lamp status={!r ? "missing" : isLate(r) ? "late" : "on-time"} />
+                        <span className={cn("text-[11px] tabular-nums", !r ? "text-faint" : isLate(r) ? "font-semibold text-wait" : "text-muted")}>
                           {r ? formatSubmitted(r.submittedAt).replace(/^.*?, /, "") : "—"}
                         </span>
                       </>
@@ -132,8 +151,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                         {r ? (
                           <Link
                             href={`/admin/reports/${r.id}`}
-                            title={`Xem báo cáo · nộp ${formatSubmitted(r.submittedAt)}`}
-                            className="mx-auto flex w-fit flex-col items-center gap-1 rounded-md px-2 py-1 hover:bg-go-soft"
+                            title={`Xem báo cáo · ${isLate(r) ? "nộp trễ" : "nộp"} ${formatSubmitted(r.submittedAt)}`}
+                            className={cn("mx-auto flex w-fit flex-col items-center gap-1 rounded-md px-2 py-1", isLate(r) ? "hover:bg-wait-soft" : "hover:bg-go-soft")}
                           >
                             {inner}
                           </Link>

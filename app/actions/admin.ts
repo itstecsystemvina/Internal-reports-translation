@@ -164,7 +164,11 @@ const settingsSchema = z.object({
   }),
   defaultCategories: z.array(z.string().trim().min(1).max(300)).max(30),
   defaultPassword: z.string().min(6).max(100),
-  deadline: z.object({ openDay: z.number().int().min(0).max(6), dueDay: z.number().int().min(0).max(6) }),
+  deadline: z.object({
+    openDay: z.number().int().min(0).max(6),
+    dueDay: z.number().int().min(0).max(6),
+    dueTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Giờ hạn chót không hợp lệ"),
+  }),
 });
 
 export async function saveSettings(input: AppSettings): Promise<Result> {

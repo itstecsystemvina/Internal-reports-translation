@@ -12,13 +12,13 @@ export type AppSettings = {
   translation: { model: string; temperature: number; systemPrompt: string };
   defaultCategories: string[];
   defaultPassword: string;
-  /** Weekdays, 0 = Sunday … 6 = Saturday. Reports open on openDay and are due by the end of dueDay. */
-  deadline: { openDay: number; dueDay: number };
+  /** Weekdays, 0 = Sunday … 6 = Saturday. Reports open on openDay and are due on dueDay at dueTime ("HH:MM", Vietnam time). */
+  deadline: { openDay: number; dueDay: number; dueTime: string };
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
   translation: { model: "gemini-flash-latest", temperature: 0.2, systemPrompt: DEFAULT_SYSTEM_PROMPT },
   defaultCategories: ["Công việc liên quan đến S-Tec System", "Công việc liên quan đến BCCV"],
   defaultPassword: "",
-  deadline: { openDay: 4, dueDay: 5 },
+  deadline: { openDay: 4, dueDay: 5, dueTime: "23:59" },
 };

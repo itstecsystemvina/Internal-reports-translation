@@ -70,6 +70,28 @@ export function formatSubmitted(date: Date | string) {
   return `${WEEKDAYS_VI[d.getUTCDay()]}, ${d.getUTCDate()}/${d.getUTCMonth() + 1} · ${hh}:${mm}`;
 }
 
+/** The moment a week's report is due: dueDay of that week at dueTime ("HH:MM"), Vietnam time. */
+export function deadlineAt(weekStart: string, dueDay: number, dueTime: string) {
+  const [h, m] = dueTime.split(":").map(Number);
+  return new Date(parseISODate(dayInWeek(weekStart, dueDay)).getTime() + (h * 60 + m) * 60_000 - VN_OFFSET_MS);
+}
+
+/** "2 ngày 3 giờ", "3 giờ 20 phút", "15 phút": the two largest units of a duration. */
+export function formatDuration(ms: number) {
+  const total = Math.max(1, Math.floor(Math.abs(ms) / 60_000));
+  const parts = [
+    [Math.floor(total / 1440), "ngày"],
+    [Math.floor((total % 1440) / 60), "giờ"],
+    [total % 60, "phút"],
+  ] as const;
+  const first = parts.findIndex(([n]) => n > 0);
+  return parts
+    .slice(first, first + 2)
+    .filter(([n]) => n > 0)
+    .map(([n, unit]) => `${n} ${unit}`)
+    .join(" ");
+}
+
 /** Whole days from today (Vietnam) until dateStr; negative if past. */
 export function daysUntil(dateStr: string, now = new Date()) {
   return Math.round((parseISODate(dateStr).getTime() - parseISODate(todayVN(now)).getTime()) / DAY_MS);

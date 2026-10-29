@@ -53,13 +53,23 @@ export function SettingsForm({ initial, hasKey }: { initial: AppSettings; hasKey
 
   return (
     <div className="space-y-5 pb-24">
-      <Section title="Hạn nộp báo cáo" desc="Nhân viên nộp báo cáo của tuần trong khoảng ngày này. Bảng theo dõi dùng ngày hạn chót.">
-        <div className="grid grid-cols-2 gap-4">
+      <Section title="Hạn nộp báo cáo" desc="Nhân viên nộp báo cáo của tuần trong khoảng này (giờ Việt Nam). Báo cáo nộp sau hạn chót vẫn được nhận nhưng bị đánh dấu trễ.">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Bắt đầu nộp">
             {daySelect(s.deadline.openDay, (d) => setS({ ...s, deadline: { ...s.deadline, openDay: d } }))}
           </Field>
-          <Field label="Hạn chót (hết ngày)">
-            {daySelect(s.deadline.dueDay, (d) => setS({ ...s, deadline: { ...s.deadline, dueDay: d } }))}
+          <Field label="Hạn chót">
+            <div className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
+              {daySelect(s.deadline.dueDay, (d) => setS({ ...s, deadline: { ...s.deadline, dueDay: d } }))}
+              <input
+                type="time"
+                required
+                aria-label="Giờ hạn chót"
+                value={s.deadline.dueTime}
+                onChange={(e) => setS({ ...s, deadline: { ...s.deadline, dueTime: e.target.value } })}
+                className={`${inputClass} tabular-nums`}
+              />
+            </div>
           </Field>
         </div>
         {dayOrder(s.deadline.openDay) > dayOrder(s.deadline.dueDay) && (
@@ -128,7 +138,7 @@ export function SettingsForm({ initial, hasKey }: { initial: AppSettings; hasKey
 
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
         <div className="mx-auto flex max-w-6xl justify-end px-4 py-3 sm:px-6">
-          <Button onClick={save} disabled={pending || dayOrder(s.deadline.openDay) > dayOrder(s.deadline.dueDay)}>
+          <Button onClick={save} disabled={pending || !s.deadline.dueTime || dayOrder(s.deadline.openDay) > dayOrder(s.deadline.dueDay)}>
             {pending ? "Đang lưu…" : "Lưu cài đặt"}
           </Button>
         </div>
