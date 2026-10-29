@@ -79,12 +79,12 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
       </div>
 
       {people.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line p-8 text-center text-sm text-muted">
+        <p className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">
           Chưa có nhân viên nào cần nộp báo cáo.{" "}
           <Link href="/admin/employees" className="font-medium text-brand underline">Thêm nhân viên</Link>
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+        <div className="overflow-x-auto rounded-2xl bg-surface shadow-card">
           <table className="w-full border-collapse text-sm sm:min-w-[640px]">
             <thead>
               <tr className="border-b border-line">

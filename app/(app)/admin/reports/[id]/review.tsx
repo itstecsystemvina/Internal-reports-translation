@@ -72,7 +72,7 @@ export function Review({
           {mode === "vi" && <span className="text-sm text-muted">Lưu xong sẽ tự dịch lại sang tiếng Hàn.</span>}
         </div>
         <ReportEditor value={draft} onChange={setDraft} lang={mode === "ko" ? "ko" : "vi"} />
-        <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/95 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
           <div className="mx-auto flex max-w-6xl justify-end gap-2 px-4 py-3 sm:px-6">
             <Button variant="outline" onClick={() => setMode("view")} disabled={pending}>Huỷ</Button>
             <Button onClick={save} disabled={pending}>{pending ? "Đang lưu…" : "Lưu thay đổi"}</Button>
@@ -133,7 +133,7 @@ export function Review({
 
 function Pane({ title, tag, status, actions, children }: { title: string; tag: string; status?: React.ReactNode; actions: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-line bg-surface">
+    <section className="rounded-2xl bg-surface shadow-card">
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3">
         <div className="flex items-center gap-2.5">
           <h2 className="font-display font-semibold">{title}</h2>

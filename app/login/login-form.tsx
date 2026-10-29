@@ -7,7 +7,7 @@ import { Button, Card, Field, Input } from "@/components/ui";
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
   return (
-    <Card className="p-6 shadow-sm">
+    <Card className="p-6">
       <form action={action} className="space-y-4">
         <Field label="Email công ty">
           <Input name="email" type="email" autoComplete="username" placeholder="ten@stecsystem.com.vn" required autoFocus={!state?.email} defaultValue={state?.email} key={state?.email} />

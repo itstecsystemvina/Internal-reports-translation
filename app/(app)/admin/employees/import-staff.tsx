@@ -53,7 +53,7 @@ export function ImportStaff({ defaultPassword }: { defaultPassword: string }) {
       <Button variant="outline" onClick={() => dialog.current?.showModal()}>
         <FileSpreadsheet className="size-4" /> Nhập từ Excel
       </Button>
-      <dialog ref={dialog} onClose={() => setSheets(null)} className="m-auto w-[min(860px,calc(100vw-32px))] rounded-xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40">
+      <dialog ref={dialog} onClose={() => setSheets(null)} className="m-auto w-[min(860px,calc(100vw-32px))] rounded-2xl bg-surface p-0 text-ink shadow-pop backdrop:bg-black/40 backdrop:backdrop-blur-[2px]">
         <div className="space-y-4 p-6">
           <div>
             <h2 className="text-lg font-bold">Nhập nhân viên từ Excel</h2>
@@ -63,7 +63,7 @@ export function ImportStaff({ defaultPassword }: { defaultPassword: string }) {
           </div>
 
           {!sheets ? (
-            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed border-line px-6 py-10 text-center text-sm text-muted hover:border-brand hover:text-ink">
+            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed border-line px-6 py-10 text-center text-sm text-muted transition hover:border-brand hover:bg-brand-soft/40 hover:text-ink">
               <FileSpreadsheet className="size-6" />
               {pending ? "Đang đọc file…" : "Chọn file .xlsx"}
               <input type="file" accept=".xlsx" className="sr-only" disabled={pending} onChange={(e) => upload(e.target.files?.[0])} />

@@ -13,7 +13,7 @@ const SIDES: { key: Side; label: string; labelKo: string }[] = [
 ];
 
 const field =
-  "h-9 w-full rounded-md border border-line bg-surface px-2.5 text-sm text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15";
+  "h-9 w-full rounded-lg border border-transparent bg-fill px-2.5 text-sm text-ink transition placeholder:text-faint focus:border-brand focus:bg-surface focus:outline-none focus:ring-4 focus:ring-brand/15";
 const COLS = "md:grid-cols-[minmax(0,1fr)_92px_170px_84px_32px]";
 
 /** Editable report: groups of tasks for this week and next week. */
@@ -82,16 +82,16 @@ function SectionCard({
   onRemoveTask: (ti: number) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-surface">
+    <div className="overflow-hidden rounded-2xl bg-surface shadow-card">
       <div className="flex items-center gap-2 border-b border-line bg-sunken px-3 py-2">
         <input
           value={section.category}
           onChange={(e) => onCategory(e.target.value)}
           placeholder="Tên nhóm công việc"
           aria-label="Tên nhóm công việc"
-          className={cn(field, "border-transparent bg-transparent font-semibold hover:border-line focus:bg-surface")}
+          className={cn(field, "bg-transparent! font-semibold hover:bg-fill! focus:bg-surface!")}
         />
-        <button type="button" onClick={onRemove} title="Xoá nhóm" aria-label="Xoá nhóm" className="grid size-8 shrink-0 place-items-center rounded-md text-faint hover:bg-stop-soft hover:text-stop">
+        <button type="button" onClick={onRemove} title="Xoá nhóm" aria-label="Xoá nhóm" className="grid size-8 shrink-0 place-items-center rounded-lg text-faint transition hover:bg-stop-soft hover:text-stop active:scale-95">
           <Trash2 className="size-4" />
         </button>
       </div>
@@ -114,7 +114,7 @@ function SectionCard({
               aria-label="Công việc"
               className={cn(field, "field-sizing-content min-h-9 resize-none py-[7px] leading-5")}
             />
-            <button type="button" onClick={() => onRemoveTask(ti)} title="Xoá dòng" aria-label="Xoá dòng" className="col-start-2 row-start-1 grid size-9 place-items-center rounded-md text-faint hover:bg-stop-soft hover:text-stop md:col-start-5">
+            <button type="button" onClick={() => onRemoveTask(ti)} title="Xoá dòng" aria-label="Xoá dòng" className="col-start-2 row-start-1 grid size-9 place-items-center rounded-lg text-faint transition hover:bg-stop-soft hover:text-stop active:scale-95 md:col-start-5">
               <X className="size-4" />
             </button>
             <div className="col-span-2 grid grid-cols-[92px_minmax(0,1fr)_84px] gap-2 md:contents">
@@ -126,7 +126,7 @@ function SectionCard({
                 placeholder="DD/MM"
                 aria-label="Ngày (DD/MM)"
                 aria-invalid={!isValidDayMonth(t.date)}
-                className={cn(field, "tabular-nums md:col-start-2 md:row-start-1", !isValidDayMonth(t.date) && "border-stop focus:border-stop focus:ring-stop/15")}
+                className={cn(field, "tabular-nums md:col-start-2 md:row-start-1", !isValidDayMonth(t.date) && "border-stop! focus:ring-stop/15")}
               />
               <input
                 value={t.assignee}
@@ -153,7 +153,7 @@ function SectionCard({
         ))}
       </div>
 
-      <button type="button" onClick={onAddTask} className="flex w-full items-center gap-1.5 border-t border-line px-4 py-2.5 text-sm text-muted hover:bg-sunken hover:text-brand">
+      <button type="button" onClick={onAddTask} className="flex w-full items-center gap-1.5 border-t border-line px-4 py-2.5 text-sm font-medium text-muted transition hover:bg-brand-soft/50 hover:text-brand">
         <Plus className="size-4" /> Thêm công việc
       </button>
     </div>

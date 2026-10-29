@@ -23,7 +23,7 @@ export function ReportView({ content, lang }: { content: ReportContent; lang: "v
                 .map((s, i) => (
                   <div key={i}>
                     <div className="mb-1.5 text-sm font-semibold">{s.category}</div>
-                    <ul className="divide-y divide-line rounded-lg border border-line">
+                    <ul className="divide-y divide-line rounded-xl bg-sunken">
                       {s.tasks.map((t, j) => (
                         <li key={j} className="flex items-start gap-3 px-3 py-2.5 text-sm">
                           <div className="min-w-0 flex-1">

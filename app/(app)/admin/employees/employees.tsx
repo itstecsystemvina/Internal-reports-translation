@@ -74,10 +74,10 @@ export function Employees({ rows, meId, defaultPassword }: { rows: Row[]; meId: 
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+      <div className="overflow-x-auto rounded-2xl bg-surface shadow-card">
         <table className="w-full min-w-[760px] text-sm">
           <thead>
-            <tr className="border-b border-line text-left text-[11px] font-semibold uppercase tracking-wider text-faint">
+            <tr className="border-b border-line bg-sunken/70 text-left text-[11px] font-semibold uppercase tracking-wider text-faint">
               <th className="w-16 px-3 py-3" title="Thứ tự trên bảng theo dõi và file xuất">Thứ tự</th>
               <th className="px-3 py-3">Nhân viên</th>
               <th className="px-3 py-3">Phòng ban</th>
@@ -88,7 +88,7 @@ export function Employees({ rows, meId, defaultPassword }: { rows: Row[]; meId: 
           </thead>
           <tbody className="divide-y divide-line">
             {shown.map(({ r, i }) => (
-              <tr key={r.id} className={cn(!r.active && "opacity-55")}>
+              <tr key={r.id} className={cn("transition-colors hover:bg-sunken/60", !r.active && "opacity-55")}>
                 <td className="px-3 py-2">
                   <div className="flex">
                     <button aria-label="Lên" disabled={i === 0 || pending || !!needle} onClick={() => move(i, -1)} className="grid size-7 place-items-center rounded text-faint hover:bg-sunken hover:text-ink disabled:opacity-30">
@@ -118,9 +118,12 @@ export function Employees({ rows, meId, defaultPassword }: { rows: Row[]; meId: 
                     >
                       <KeyRound className="size-3.5" /> Đặt lại MK
                     </Button>
-                    {r.id !== meId && (
+                    {r.id === meId ? (
+                      // Keeps the other buttons aligned with rows that have a delete button.
+                      <span aria-hidden className="size-8 shrink-0" />
+                    ) : (
                       <Button
-                        variant="ghost" size="sm" disabled={pending} aria-label="Xoá" className="hover:text-stop"
+                        variant="ghost" size="icon-sm" disabled={pending} aria-label="Xoá" className="hover:bg-stop-soft hover:text-stop"
                         onClick={() => confirm(`Xoá ${r.name}? Toàn bộ báo cáo của người này cũng sẽ bị xoá.`) && run(() => deleteEmployee(r.id), "Đã xoá nhân viên")}
                       >
                         <Trash2 className="size-3.5" />
@@ -137,7 +140,7 @@ export function Employees({ rows, meId, defaultPassword }: { rows: Row[]; meId: 
         </table>
       </div>
 
-      <dialog ref={dialog} onClose={() => setEditing(null)} className="m-auto w-[min(480px,calc(100vw-32px))] rounded-xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40">
+      <dialog ref={dialog} onClose={() => setEditing(null)} className="m-auto w-[min(480px,calc(100vw-32px))] rounded-2xl bg-surface p-0 text-ink shadow-pop backdrop:bg-black/40 backdrop:backdrop-blur-[2px]">
         {editing && (
           <form
             className="space-y-4 p-6"

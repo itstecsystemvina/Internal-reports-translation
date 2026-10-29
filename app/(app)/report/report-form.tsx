@@ -52,8 +52,8 @@ export function ReportForm({
   return (
     <div className="pb-24">
       <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-        <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 font-medium ${submitted ? "border-go/30 bg-go-soft text-go" : "border-stop/30 bg-stop-soft text-stop"}`}>
-          <Lamp on={submitted} className="size-2.5" />
+        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-semibold ${submitted ? "bg-go-soft text-go" : "bg-stop-soft text-stop"}`}>
+          <Lamp on={submitted} />
           {submitted ? `Đã nộp · ${formatSubmitted(submittedAt!)}` : "Chưa nộp"}
         </span>
         <span className="text-muted">
@@ -67,7 +67,7 @@ export function ReportForm({
 
       <ReportEditor value={draft} onChange={setDraft} defaultAssignee={assignee} />
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 py-3 sm:px-6">
           {dirty && <span className="text-sm text-muted">Có thay đổi chưa lưu</span>}
           <Button onClick={save} disabled={pending}>

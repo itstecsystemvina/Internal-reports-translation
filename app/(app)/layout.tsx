@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { Nav, ThemeToggle } from "@/components/nav";
+import { Logo } from "@/components/logo";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
@@ -9,24 +10,29 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 px-4 sm:px-6">
-          <Link href="/" className="py-3 text-[15px] font-bold tracking-tight">
-            S-Tec <span className="font-medium text-muted">Báo cáo tuần</span>
+      <header className="sticky top-0 z-20 border-b border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2.5 py-3 text-[15px] tracking-tight">
+            <Logo className="h-6" />
+            <span className="font-medium text-muted">Báo cáo tuần</span>
           </Link>
-          <div className="order-last w-full md:order-none md:w-auto md:flex-1">
+          <div className="order-last w-full pb-2.5 md:order-none md:w-auto md:flex-1 md:pb-0">
             <Nav isAdmin={isAdmin} />
           </div>
           <div className="ml-auto flex items-center gap-1">
             {isAdmin ? (
-              <Link href="/account" title="Đổi mật khẩu" className="mr-1 hidden max-w-48 truncate rounded-md px-2 py-1 text-sm text-muted hover:bg-sunken hover:text-ink sm:block">
-                {user.name}
+              <Link href="/account" title="Đổi mật khẩu" className="mr-1 hidden items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm text-muted transition hover:bg-ink/[0.06] hover:text-ink sm:flex">
+                <Avatar name={user.name} />
+                <span className="max-w-44 truncate">{user.name}</span>
               </Link>
             ) : (
-              <span className="mr-1 hidden max-w-48 truncate px-2 text-sm text-muted sm:block">{user.name}</span>
+              <span className="mr-1 hidden items-center gap-2 py-1 pr-2 pl-1 text-sm text-muted sm:flex">
+                <Avatar name={user.name} />
+                <span className="max-w-44 truncate">{user.name}</span>
+              </span>
             )}
             <ThemeToggle />
-            <a href="/logout" aria-label="Đăng xuất" title="Đăng xuất" className="grid size-8 place-items-center rounded-md text-muted hover:bg-sunken hover:text-ink">
+            <a href="/logout" aria-label="Đăng xuất" title="Đăng xuất" className="grid size-9 place-items-center rounded-lg text-muted transition hover:bg-ink/[0.06] hover:text-ink active:scale-95">
               <LogOut className="size-4" />
             </a>
           </div>
@@ -34,5 +40,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
     </>
+  );
+}
+
+/** Initials of the last two words, e.g. "Trần Tùng Lâm" → "TL". */
+function Avatar({ name }: { name: string }) {
+  const initials = name.trim().split(/\s+/).slice(-2).map((w) => w[0]).join("").toUpperCase();
+  return (
+    <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-soft text-[11px] font-bold text-brand">
+      {initials}
+    </span>
   );
 }

@@ -78,7 +78,7 @@ export function SettingsForm({ initial, hasKey }: { initial: AppSettings; hasKey
                 setS({ ...s, defaultCategories: next });
               }}
             />
-            <Button variant="ghost" aria-label="Xoá nhóm" onClick={() => setS({ ...s, defaultCategories: s.defaultCategories.filter((_, j) => j !== i) })}>
+            <Button variant="ghost" size="icon" aria-label="Xoá nhóm" className="shrink-0 hover:bg-stop-soft hover:text-stop" onClick={() => setS({ ...s, defaultCategories: s.defaultCategories.filter((_, j) => j !== i) })}>
               <X className="size-4" />
             </Button>
           </div>
@@ -126,7 +126,7 @@ export function SettingsForm({ initial, hasKey }: { initial: AppSettings; hasKey
         </Button>
       </Section>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
         <div className="mx-auto flex max-w-6xl justify-end px-4 py-3 sm:px-6">
           <Button onClick={save} disabled={pending || dayOrder(s.deadline.openDay) > dayOrder(s.deadline.dueDay)}>
             {pending ? "Đang lưu…" : "Lưu cài đặt"}

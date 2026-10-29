@@ -8,15 +8,15 @@ export function WeekNav({ week, basePath }: { week: string; basePath: string }) 
   const isCurrent = week === currentWeekStart();
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center rounded-lg border border-line bg-surface">
-        <Link href={href(addWeeks(week, -1))} aria-label="Tuần trước" className="grid size-10 place-items-center text-muted hover:text-ink">
+      <div className="flex items-center rounded-xl bg-surface p-0.5 shadow-card">
+        <Link href={href(addWeeks(week, -1))} aria-label="Tuần trước" className="grid size-9 place-items-center rounded-[10px] text-muted transition hover:bg-ink/[0.06] hover:text-ink active:scale-95">
           <ChevronLeft className="size-4" />
         </Link>
         <div className="min-w-[168px] px-1 text-center leading-tight">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-faint">Tuần {weekNumber(week)}</div>
           <div className="text-sm font-medium tabular-nums">{weekRangeLabel(week)}</div>
         </div>
-        <Link href={href(addWeeks(week, 1))} aria-label="Tuần sau" className="grid size-10 place-items-center text-muted hover:text-ink">
+        <Link href={href(addWeeks(week, 1))} aria-label="Tuần sau" className="grid size-9 place-items-center rounded-[10px] text-muted transition hover:bg-ink/[0.06] hover:text-ink active:scale-95">
           <ChevronRight className="size-4" />
         </Link>
       </div>

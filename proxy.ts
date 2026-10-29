@@ -13,5 +13,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Public images (logo, favicon) must load without a session, e.g. on the login page.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|ico|svg)$).*)"],
 };
