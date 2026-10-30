@@ -1,6 +1,8 @@
 // Interface text in Vietnamese and Korean. Report contents are not translated here.
 // The Korean dictionary is typed against the Vietnamese one, so a missing key is a type error.
 
+import type { TranslationStatus } from "@/lib/types";
+
 export type Lang = "vi" | "ko";
 export const LANG_COOKIE = "bccv-lang";
 export const isLang = (v: unknown): v is Lang => v === "vi" || v === "ko";
@@ -101,6 +103,19 @@ const vi = {
     translatingKo: "Đang dịch sang tiếng Hàn…",
     noTranslation: "Chưa có bản dịch. Bấm “Dịch lại” để thử lại.",
     translateFailed: "Dịch thất bại",
+    queued: "Chờ hạn nộp",
+    queuedKo: "Sẽ tự dịch sau hạn nộp. Bấm “Dịch lại” để dịch ngay.",
+  },
+  translator: {
+    button: "Dịch",
+    title: "Dịch sang tiếng Hàn",
+    desc: (week: number) => `Chọn báo cáo tuần ${week} cần dịch. Mỗi báo cáo được gửi thành một yêu cầu riêng.`,
+    status: { queued: "Chờ hạn nộp", pending: "Đang dịch", done: "Đã dịch", error: "Lỗi" } as Record<TranslationStatus, string>,
+    all: "Chọn tất cả",
+    run: (n: number) => `Dịch ${n} bản`,
+    running: (done: number, n: number) => `Đang dịch ${done}/${n}…`,
+    result: (ok: number, failed: number) => (failed ? `Đã dịch ${ok} bản · ${failed} bản lỗi` : `Đã dịch ${ok} bản`),
+    close: "Đóng",
   },
   staff: {
     title: "Nhân viên",
@@ -184,7 +199,7 @@ const vi = {
     password: "Mật khẩu",
     passwordHint: "Ít nhất 6 ký tự.",
     translateTitle: "Dịch tiếng Hàn",
-    translateDesc: "Báo cáo được tự động dịch bằng Google Gemini ngay sau khi nhân viên nộp.",
+    translateDesc: "Báo cáo được tự động dịch bằng Google Gemini sau hạn nộp (lượt chạy lúc 0 giờ hằng ngày). Báo cáo nộp trễ được dịch ngay. Có thể dịch thủ công ở trang Theo dõi nộp.",
     hasKey: "Đã có API key",
     noKey: "Chưa có GEMINI_API_KEY",
     testing: "Đang dịch thử…",
@@ -322,6 +337,19 @@ const ko: Dict = {
     translatingKo: "한국어로 번역 중…",
     noTranslation: "번역본이 없습니다. “다시 번역”을 눌러 주세요.",
     translateFailed: "번역 실패",
+    queued: "마감 대기",
+    queuedKo: "마감 후 자동 번역됩니다. “다시 번역”을 누르면 바로 번역합니다.",
+  },
+  translator: {
+    button: "번역",
+    title: "한국어로 번역",
+    desc: (week) => `${week}주차에서 번역할 보고서를 선택하세요. 보고서마다 따로 요청합니다.`,
+    status: { queued: "마감 대기", pending: "번역 중", done: "번역 완료", error: "오류" },
+    all: "전체 선택",
+    run: (n) => `${n}건 번역`,
+    running: (done, n) => `번역 중 ${done}/${n}…`,
+    result: (ok, failed) => (failed ? `${ok}건 번역 완료 · ${failed}건 실패` : `${ok}건 번역 완료`),
+    close: "닫기",
   },
   staff: {
     title: "직원",
@@ -405,7 +433,7 @@ const ko: Dict = {
     password: "비밀번호",
     passwordHint: "6자 이상.",
     translateTitle: "한국어 번역",
-    translateDesc: "직원이 제출하면 Google Gemini로 자동 번역됩니다.",
+    translateDesc: "마감 후 Google Gemini로 자동 번역됩니다(매일 0시 실행). 지연 제출은 바로 번역됩니다. 제출 현황 화면에서 직접 번역할 수도 있습니다.",
     hasKey: "API 키 설정됨",
     noKey: "GEMINI_API_KEY 없음",
     testing: "테스트 번역 중…",

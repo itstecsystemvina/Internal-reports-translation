@@ -14,6 +14,7 @@ import { DeadlineText } from "@/components/deadline";
 import { Lamp, type SubmitStatus } from "@/components/traffic-light";
 import { getLang } from "@/lib/lang";
 import { dictionaries } from "@/lib/i18n";
+import { TranslateReports } from "./translate-reports";
 
 const WEEKS_SHOWN = 6;
 const WEEKS_ON_PHONE = 2;
@@ -91,6 +92,13 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
         {selected.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             {untranslated > 0 && <span className="text-xs text-wait">{t.tracker.untranslated(untranslated)}</span>}
+            <TranslateReports
+              week={weekNumber(week)}
+              reports={people.flatMap((p) => {
+                const r = byKey.get(`${p.id}|${week}`);
+                return r ? [{ id: r.id, name: p.name, status: r.translationStatus }] : [];
+              })}
+            />
             <a href={`/admin/export?week=${week}&lang=vi`} className={buttonClass("outline", "sm")}>
               <FileDown className="size-4" /> DOCX (VN)
             </a>

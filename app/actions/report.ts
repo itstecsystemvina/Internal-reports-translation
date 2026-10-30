@@ -6,7 +6,8 @@ import { db, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { cleanContent, isEmptyContent } from "@/lib/report-schema";
 import { translateReport } from "@/lib/translate";
-import { isValidWeekStart } from "@/lib/week";
+import { deadlineAt, isValidWeekStart } from "@/lib/week";
+import { getSettings } from "@/lib/settings";
 import { getT } from "@/lib/lang";
 
 export async function submitReport(weekStart: string, input: unknown) {
@@ -21,17 +22,22 @@ export async function submitReport(weekStart: string, input: unknown) {
   }
   if (isEmptyContent(content)) return { error: t.report.emptyReport };
 
+  // Before the deadline the report waits for the scheduled run, so drafts edited several times are translated once.
+  // After the deadline (late reports, late edits) it is translated straight away.
   const now = new Date();
+  const { deadline } = await getSettings();
+  const translateNow = now > deadlineAt(weekStart, deadline.dueDay, deadline.dueTime);
+  const translationStatus = translateNow ? "pending" : "queued";
   const [row] = await db
     .insert(schema.reports)
-    .values({ userId: user.id, weekStart, content, translationStatus: "pending", submittedAt: now, updatedAt: now })
+    .values({ userId: user.id, weekStart, content, translationStatus, submittedAt: now, updatedAt: now })
     .onConflictDoUpdate({
       target: [schema.reports.userId, schema.reports.weekStart],
-      set: { content, translationStatus: "pending", translationError: null, updatedAt: now },
+      set: { content, translationStatus, translationError: null, updatedAt: now },
     })
     .returning({ id: schema.reports.id, submittedAt: schema.reports.submittedAt });
 
-  after(() => translateReport(row.id));
+  if (translateNow) after(() => translateReport(row.id));
   revalidatePath("/report");
   revalidatePath("/admin");
   return { ok: true, submittedAt: row.submittedAt.toISOString(), updatedAt: now.toISOString() };

@@ -5,7 +5,8 @@ import { SESSION_COOKIE, verifySession } from "@/lib/session";
 export async function proxy(request: NextRequest) {
   const signedIn = !!(await verifySession(request.cookies.get(SESSION_COOKIE)?.value));
   const { pathname } = request.nextUrl;
-  if (pathname === "/logout") return NextResponse.next();
+  // Scheduled jobs check their own secret.
+  if (pathname === "/logout" || pathname.startsWith("/api/cron/")) return NextResponse.next();
   const isLogin = pathname === "/login";
   if (!signedIn && !isLogin) return NextResponse.redirect(new URL("/login", request.url));
   if (signedIn && isLogin) return NextResponse.redirect(new URL("/", request.url));

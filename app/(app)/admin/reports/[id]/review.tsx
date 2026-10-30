@@ -102,6 +102,8 @@ export function Review({
             <span className="text-xs text-muted">{t.review.translatedAt} {translatedAt}</span>
           ) : status === "pending" ? (
             <Badge tone="wait">{t.review.translating}</Badge>
+          ) : status === "queued" ? (
+            <Badge>{t.review.queued}</Badge>
           ) : (
             <Badge tone="stop">{t.review.translateError}</Badge>
           )
@@ -125,7 +127,7 @@ export function Review({
         ) : (
           <div className="grid place-items-center gap-2 py-16 text-center text-sm text-muted">
             <Languages className="size-6 text-faint" />
-            {status === "pending" ? t.review.translatingKo : t.review.noTranslation}
+            {status === "pending" ? t.review.translatingKo : status === "queued" ? t.review.queuedKo : t.review.noTranslation}
           </div>
         )}
       </Pane>

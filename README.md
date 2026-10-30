@@ -19,6 +19,7 @@ Built with Next.js, Neon Postgres and Google Gemini.
    |---|---|
    | `SESSION_SECRET` | A long random string. Generate one with `openssl rand -base64 32`. |
    | `GEMINI_API_KEY` | A key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey). |
+   | `CRON_SECRET` | A long random string. Protects the daily translation job (runs 00:05 Vietnam time and translates reports whose deadline has passed). |
    | `DEFAULT_PASSWORD` | Starting password for the first admin and for new employees (at least 6 characters). Keep it out of the repository and share it with staff privately. |
 
 4. **Redeploy** (Deployments → ⋯ → Redeploy). Each deploy creates or updates the database tables and makes sure the default admin exists.

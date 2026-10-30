@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
@@ -59,6 +59,19 @@ export async function saveTranslation(reportId: string, input: unknown): Promise
   } catch (e) {
     return fail(e);
   }
+}
+
+/** Translates the chosen reports, one Gemini request each. The tracker sends a few ids per call to show progress. */
+export async function translateReports(ids: string[]): Promise<{ id: string; ok: boolean }[]> {
+  await requireAdmin();
+  const list = z.array(z.uuid()).max(5).parse(ids);
+  await Promise.all(list.map(translateReport));
+  const rows = await db
+    .select({ id: schema.reports.id, status: schema.reports.translationStatus })
+    .from(schema.reports)
+    .where(inArray(schema.reports.id, list));
+  revalidatePath("/admin");
+  return rows.map((r) => ({ id: r.id, ok: r.status === "done" }));
 }
 
 export async function retranslate(reportId: string): Promise<Result> {
