@@ -10,6 +10,7 @@ import { ReportView } from "@/components/report-view";
 import { Badge, Button } from "@/components/ui";
 import type { ReportContent, TranslationStatus } from "@/lib/types";
 import { hasInvalidDate } from "@/lib/day-month";
+import { useT } from "@/components/lang";
 
 type Mode = "view" | "vi" | "ko";
 
@@ -29,6 +30,7 @@ export function Review({
   translatedAt: string | null;
 }) {
   const router = useRouter();
+  const t = useT();
   const [mode, setMode] = useState<Mode>("view");
   const [draft, setDraft] = useState<ReportContent>(content);
   const [pending, start] = useTransition();
@@ -36,8 +38,8 @@ export function Review({
   // While a translation is running in the background, check back every few seconds.
   useEffect(() => {
     if (status !== "pending" || mode !== "view") return;
-    const t = setInterval(() => router.refresh(), 4000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => router.refresh(), 4000);
+    return () => clearInterval(timer);
   }, [status, mode, router]);
 
   const edit = (m: Mode) => {
@@ -46,11 +48,11 @@ export function Review({
   };
 
   const save = () => {
-    if (hasInvalidDate(draft)) return void toast.error("Có ngày chưa đúng định dạng DD/MM (ô viền đỏ).");
+    if (hasInvalidDate(draft)) return void toast.error(t.common.invalidDate);
     start(async () => {
       const res = mode === "vi" ? await saveOriginal(reportId, draft) : await saveTranslation(reportId, draft);
       if ("error" in res) return void toast.error(res.error);
-      toast.success(mode === "vi" ? "Đã lưu bản gốc · đang dịch lại" : "Đã lưu bản dịch");
+      toast.success(mode === "vi" ? t.review.savedOriginal : t.review.savedTranslation);
       setMode("view");
       router.refresh();
     });
@@ -59,8 +61,8 @@ export function Review({
   const redo = () =>
     start(async () => {
       const res = await retranslate(reportId);
-      if ("error" in res) toast.error(`Dịch thất bại: ${res.error}`);
-      else toast.success("Đã dịch lại");
+      if ("error" in res) toast.error(t.review.failed(res.error));
+      else toast.success(t.review.retranslated);
       router.refresh();
     });
 
@@ -68,14 +70,14 @@ export function Review({
     return (
       <div className="pb-24">
         <div className="mb-5 flex items-center gap-3">
-          <Badge tone="brand">{mode === "vi" ? "Đang sửa bản gốc (Tiếng Việt)" : "Đang sửa bản dịch (한국어)"}</Badge>
-          {mode === "vi" && <span className="text-sm text-muted">Lưu xong sẽ tự dịch lại sang tiếng Hàn.</span>}
+          <Badge tone="brand">{mode === "vi" ? t.review.editingOriginal : t.review.editingTranslation}</Badge>
+          {mode === "vi" && <span className="text-sm text-muted">{t.review.willRetranslate}</span>}
         </div>
         <ReportEditor value={draft} onChange={setDraft} lang={mode === "ko" ? "ko" : "vi"} />
         <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface/75 backdrop-blur-xl backdrop-saturate-180">
           <div className="mx-auto flex max-w-6xl justify-end gap-2 px-4 py-3 sm:px-6">
-            <Button variant="outline" onClick={() => setMode("view")} disabled={pending}>Huỷ</Button>
-            <Button onClick={save} disabled={pending}>{pending ? "Đang lưu…" : "Lưu thay đổi"}</Button>
+            <Button variant="outline" onClick={() => setMode("view")} disabled={pending}>{t.common.cancel}</Button>
+            <Button onClick={save} disabled={pending}>{pending ? t.common.saving : t.common.save}</Button>
           </div>
         </div>
       </div>
@@ -85,32 +87,32 @@ export function Review({
   return (
     <div className="grid gap-5 lg:grid-cols-2">
       <Pane
-        title="Bản gốc"
-        tag="Tiếng Việt"
-        actions={<Button variant="ghost" size="sm" onClick={() => edit("vi")}><Pencil className="size-3.5" /> Sửa</Button>}
+        title={t.review.original}
+        tag={t.review.viTag}
+        actions={<Button variant="ghost" size="sm" onClick={() => edit("vi")}><Pencil className="size-3.5" /> {t.common.edit}</Button>}
       >
         <ReportView content={content} lang="vi" />
       </Pane>
 
       <Pane
-        title="Bản dịch"
-        tag="한국어"
+        title={t.review.translation}
+        tag={t.review.koTag}
         status={
           status === "done" ? (
-            <span className="text-xs text-muted">Dịch lúc {translatedAt}</span>
+            <span className="text-xs text-muted">{t.review.translatedAt} {translatedAt}</span>
           ) : status === "pending" ? (
-            <Badge tone="wait">Đang dịch…</Badge>
+            <Badge tone="wait">{t.review.translating}</Badge>
           ) : (
-            <Badge tone="stop">Lỗi dịch</Badge>
+            <Badge tone="stop">{t.review.translateError}</Badge>
           )
         }
         actions={
           <>
             <Button variant="ghost" size="sm" onClick={redo} disabled={pending}>
-              <RefreshCw className={`size-3.5 ${pending ? "animate-spin" : ""}`} /> Dịch lại
+              <RefreshCw className={`size-3.5 ${pending ? "animate-spin" : ""}`} /> {t.review.retranslate}
             </Button>
             {translation && (
-              <Button variant="ghost" size="sm" onClick={() => edit("ko")}><Pencil className="size-3.5" /> Sửa</Button>
+              <Button variant="ghost" size="sm" onClick={() => edit("ko")}><Pencil className="size-3.5" /> {t.common.edit}</Button>
             )}
           </>
         }
@@ -123,7 +125,7 @@ export function Review({
         ) : (
           <div className="grid place-items-center gap-2 py-16 text-center text-sm text-muted">
             <Languages className="size-6 text-faint" />
-            {status === "pending" ? "Đang dịch sang tiếng Hàn…" : "Chưa có bản dịch. Bấm “Dịch lại” để thử lại."}
+            {status === "pending" ? t.review.translatingKo : t.review.noTranslation}
           </div>
         )}
       </Pane>

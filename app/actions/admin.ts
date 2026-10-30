@@ -12,16 +12,19 @@ import { getSettings, saveSetting } from "@/lib/settings";
 import { translateContent, translateReport } from "@/lib/translate";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/defaults";
 import { defaultTracked, parseStaffWorkbook, upsertStaff } from "@/lib/staff-import";
+import { getT } from "@/lib/lang";
 
 type Result = { ok: true } | { error: string };
 /** Password for new and reset accounts. Throws if neither Cài đặt nor DEFAULT_PASSWORD sets one. */
 async function defaultPassword() {
   const { defaultPassword } = await getSettings();
-  if (defaultPassword.length < 6) throw new Error("Chưa có mật khẩu mặc định. Đặt mật khẩu mặc định trong Cài đặt trước.");
+  if (defaultPassword.length < 6) throw new Error((await getT()).staff.noDefaultPassword);
   return defaultPassword;
 }
 
-const fail = (e: unknown): Result => ({ error: e instanceof z.ZodError ? "Dữ liệu không hợp lệ." : e instanceof Error ? e.message : String(e) });
+const fail = async (e: unknown): Promise<Result> => ({
+  error: e instanceof z.ZodError ? (await getT()).common.invalidData : e instanceof Error ? e.message : String(e),
+});
 
 // ── Reports ────────────────────────────────────────────────────────────────
 
@@ -63,7 +66,7 @@ export async function retranslate(reportId: string): Promise<Result> {
   await translateReport(reportId);
   const [r] = await db.select({ status: schema.reports.translationStatus, error: schema.reports.translationError }).from(schema.reports).where(eq(schema.reports.id, reportId));
   revalidatePath(`/admin/reports/${reportId}`);
-  return r?.status === "done" ? { ok: true } : { error: r?.error ?? "Dịch thất bại" };
+  return r?.status === "done" ? { ok: true } : { error: r?.error ?? (await getT()).review.translateFailed };
 }
 
 // ── Employees ──────────────────────────────────────────────────────────────
@@ -84,7 +87,7 @@ export async function createEmployee(input: EmployeeInput): Promise<Result> {
   try {
     const data = employeeSchema.parse(input);
     const [dup] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, data.email));
-    if (dup) return { error: "Email này đã có tài khoản." };
+    if (dup) return { error: (await getT()).staff.emailTaken };
     const password = await defaultPassword();
     const all = await db.select({ o: schema.users.sortOrder }).from(schema.users);
     await db.insert(schema.users).values({
@@ -109,9 +112,9 @@ export async function updateEmployee(id: string, input: EmployeeInput): Promise<
       .select({ id: schema.users.id })
       .from(schema.users)
       .where(and(eq(schema.users.email, data.email), ne(schema.users.id, id)));
-    if (dup) return { error: "Email này đã có tài khoản khác." };
+    if (dup) return { error: (await getT()).staff.emailTakenOther };
     if (id === me.id && (data.role !== "admin" || !data.active)) {
-      return { error: "Bạn không thể tự gỡ quyền admin hoặc khoá tài khoản của chính mình." };
+      return { error: (await getT()).staff.cantDemoteSelf };
     }
     await db
       .update(schema.users)
@@ -137,7 +140,7 @@ export async function resetPassword(id: string): Promise<Result> {
 
 export async function deleteEmployee(id: string): Promise<Result> {
   const me = await requireAdmin();
-  if (id === me.id) return { error: "Bạn không thể xoá tài khoản của chính mình." };
+  if (id === me.id) return { error: (await getT()).staff.cantDeleteSelf };
   await db.delete(schema.users).where(eq(schema.users.id, id));
   revalidatePath("/admin", "layout");
   return { ok: true };
@@ -210,11 +213,12 @@ export type ImportPreview = {
 export async function previewStaffImport(form: FormData): Promise<{ sheets: ImportPreview } | { error: string }> {
   await requireAdmin();
   const file = form.get("file");
-  if (!(file instanceof File) || file.size === 0) return { error: "Chọn một file Excel (.xlsx)." };
-  if (file.size > 5 * 1024 * 1024) return { error: "File lớn hơn 5MB." };
+  const t = await getT();
+  if (!(file instanceof File) || file.size === 0) return { error: t.importer.chooseFile };
+  if (file.size > 5 * 1024 * 1024) return { error: t.importer.tooLarge };
   try {
     const sheets = await parseStaffWorkbook(await file.arrayBuffer());
-    if (sheets.length === 0) return { error: "Không tìm thấy cột Email và Họ tên trong file." };
+    if (sheets.length === 0) return { error: t.importer.noColumns };
     const known = new Set((await db.select({ email: schema.users.email }).from(schema.users)).map((u) => u.email));
     return {
       sheets: sheets.map((s) => ({
@@ -223,7 +227,7 @@ export async function previewStaffImport(form: FormData): Promise<{ sheets: Impo
       })),
     };
   } catch {
-    return { error: "Không đọc được file. Hãy dùng định dạng .xlsx." };
+    return { error: t.importer.unreadable };
   }
 }
 
@@ -243,6 +247,6 @@ export async function importStaff(rows: unknown): Promise<{ added: number; updat
     revalidatePath("/admin", "layout");
     return result;
   } catch (e) {
-    return fail(e) as { error: string };
+    return (await fail(e)) as { error: string };
   }
 }

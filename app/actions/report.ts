@@ -7,17 +7,19 @@ import { requireUser } from "@/lib/auth";
 import { cleanContent, isEmptyContent } from "@/lib/report-schema";
 import { translateReport } from "@/lib/translate";
 import { isValidWeekStart } from "@/lib/week";
+import { getT } from "@/lib/lang";
 
 export async function submitReport(weekStart: string, input: unknown) {
   const user = await requireUser();
-  if (!isValidWeekStart(weekStart)) return { error: "Tuần không hợp lệ." };
+  const t = await getT();
+  if (!isValidWeekStart(weekStart)) return { error: t.common.invalidWeek };
   let content;
   try {
     content = cleanContent(input);
   } catch {
-    return { error: "Dữ liệu báo cáo không hợp lệ." };
+    return { error: t.report.invalidReport };
   }
-  if (isEmptyContent(content)) return { error: "Báo cáo chưa có công việc nào." };
+  if (isEmptyContent(content)) return { error: t.report.emptyReport };
 
   const now = new Date();
   const [row] = await db

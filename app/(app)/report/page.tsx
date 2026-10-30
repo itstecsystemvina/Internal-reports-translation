@@ -7,6 +7,7 @@ import { currentWeekStart, isValidWeekStart } from "@/lib/week";
 import { PageHeader } from "@/components/ui";
 import { WeekNav } from "@/components/week-nav";
 import { ReportForm } from "./report-form";
+import { getT } from "@/lib/lang";
 
 export default async function MyReportPage({ searchParams }: PageProps<"/report">) {
   const user = await requireUser();
@@ -21,7 +22,7 @@ export default async function MyReportPage({ searchParams }: PageProps<"/report"
 
   return (
     <>
-      <PageHeader title="Báo cáo tuần" sub={user.name} actions={<WeekNav week={week} basePath="/report" />} />
+      <PageHeader title={(await getT()).report.title} sub={user.name} actions={<WeekNav week={week} basePath="/report" />} />
       <ReportForm
         key={week}
         week={week}

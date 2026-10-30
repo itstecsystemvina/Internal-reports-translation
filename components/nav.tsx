@@ -2,23 +2,25 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-
-const ADMIN = [
-  { href: "/admin", label: "Theo dõi nộp" },
-  { href: "/report", label: "Báo cáo của tôi" },
-  { href: "/admin/employees", label: "Nhân viên" },
-  { href: "/admin/settings", label: "Cài đặt" },
-];
-const EMPLOYEE = [
-  { href: "/report", label: "Báo cáo của tôi" },
-  { href: "/account", label: "Đổi mật khẩu" },
-];
+import { LANG_COOKIE, type Lang } from "@/lib/i18n";
+import { useLang, useT } from "@/components/lang";
 
 export function Nav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const items = isAdmin ? ADMIN : EMPLOYEE;
+  const t = useT();
+  const items = isAdmin
+    ? [
+        { href: "/admin", label: t.nav.tracker },
+        { href: "/report", label: t.nav.myReport },
+        { href: "/admin/employees", label: t.nav.employees },
+        { href: "/admin/settings", label: t.nav.settings },
+      ]
+    : [
+        { href: "/report", label: t.nav.myReport },
+        { href: "/account", label: t.nav.changePassword },
+      ];
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" || pathname.startsWith("/admin/reports") : pathname.startsWith(href);
 
@@ -49,12 +51,51 @@ export function Nav({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
+/** VI | 한 switch. The choice is kept in a cookie so the server renders in that language. */
+export function LangToggle() {
+  const lang = useLang();
+  const t = useT();
+  const router = useRouter();
+  const choose = (next: Lang) => {
+    if (next === lang) return;
+    document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh();
+  };
+  return (
+    <div role="group" aria-label={t.nav.language} className="flex rounded-lg bg-fill p-0.5 text-xs font-semibold">
+      {(
+        [
+          ["vi", "VI", "Tiếng Việt"],
+          ["ko", "한", "한국어"],
+        ] as const
+      ).map(([code, label, full]) => (
+        <button
+          key={code}
+          type="button"
+          lang={code}
+          title={full}
+          aria-label={full}
+          aria-pressed={lang === code}
+          onClick={() => choose(code)}
+          className={cn(
+            "grid h-7 min-w-8 place-items-center rounded-md px-2 transition",
+            lang === code ? "bg-surface text-ink shadow-[0_1px_3px_rgb(0_0_0/0.12)] dark:bg-white/20" : "text-muted hover:text-ink",
+          )}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function ThemeToggle() {
+  const t = useT();
   return (
     <button
       type="button"
-      aria-label="Đổi giao diện sáng/tối"
-      title="Đổi giao diện sáng/tối"
+      aria-label={t.nav.theme}
+      title={t.nav.theme}
       className="dn-toggle"
       onClick={() => {
         const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";

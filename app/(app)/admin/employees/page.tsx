@@ -4,10 +4,12 @@ import { db, schema } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { PageHeader } from "@/components/ui";
 import { Employees } from "./employees";
+import { getT } from "@/lib/lang";
 
 export default async function EmployeesPage() {
   const me = await requireAdmin();
   const { defaultPassword } = await getSettings();
+  const t = await getT();
   const rows = await db
     .select({
       id: schema.users.id,
@@ -24,7 +26,7 @@ export default async function EmployeesPage() {
 
   return (
     <>
-      <PageHeader title="Nhân viên" sub={`${rows.length} tài khoản · đăng nhập bằng email công ty`} />
+      <PageHeader title={t.staff.title} sub={t.staff.sub(rows.length)} />
       <Employees rows={rows} meId={me.id} defaultPassword={defaultPassword} />
     </>
   );

@@ -6,12 +6,14 @@ import { db, schema } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { cn } from "@/lib/cn";
 import {
-  WEEKDAYS_VI, addWeeks, currentWeekStart, dayInWeek, deadlineAt, formatSubmitted, isValidWeekStart, shortDate, todayVN, weekNumber,
+  addWeeks, currentWeekStart, dayInWeek, deadlineAt, formatSubmitted, formatSubmittedShort, isValidWeekStart, shortDate, todayVN, weekNumber, weekdayShort,
 } from "@/lib/week";
 import { PageHeader, buttonClass } from "@/components/ui";
 import { WeekNav } from "@/components/week-nav";
 import { DeadlineText } from "@/components/deadline";
 import { Lamp, type SubmitStatus } from "@/components/traffic-light";
+import { getLang } from "@/lib/lang";
+import { dictionaries } from "@/lib/i18n";
 
 const WEEKS_SHOWN = 6;
 const WEEKS_ON_PHONE = 2;
@@ -24,6 +26,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
   const week = isValidWeekStart(sp.week as string) ? (sp.week as string) : currentWeekStart();
   const thisWeek = currentWeekStart();
   const { deadline } = await getSettings();
+  const lang = await getLang();
+  const t = dictionaries[lang];
 
   // Columns: the selected week (last) and the weeks before it.
   const weeks = Array.from({ length: WEEKS_SHOWN }, (_, i) => addWeeks(week, i - WEEKS_SHOWN + 1));
@@ -58,8 +62,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
   return (
     <>
       <PageHeader
-        title="Theo dõi nộp báo cáo"
-        sub={<DeadlineText week={week} deadline={deadline} />}
+        title={t.tracker.title}
+        sub={<DeadlineText week={week} deadline={deadline} lang={lang} />}
         actions={<WeekNav week={week} basePath="/admin" />}
       />
 
@@ -68,25 +72,25 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
           <span className="font-display text-xl font-bold tabular-nums text-ink">
             {selected.length}/{people.length}
           </span>{" "}
-          đã nộp tuần {weekNumber(week)}
-          {lateCount > 0 && <span className="font-medium text-wait"> · {lateCount} nộp trễ</span>}
+          {t.tracker.submittedOfWeek(weekNumber(week))}
+          {lateCount > 0 && <span className="font-medium text-wait"> · {t.tracker.lateCount(lateCount)}</span>}
           <span className="mt-1 flex flex-wrap gap-x-3 text-xs">
             {(
               [
-                ["on-time", "Đúng hạn"],
-                ["late", "Trễ hạn"],
-                ["missing", "Chưa nộp"],
+                ["on-time", t.status.onTime],
+                ["late", t.status.late],
+                ["missing", t.status.missing],
               ] as [SubmitStatus, string][]
             ).map(([s, label]) => (
               <span key={s} className="inline-flex items-center gap-1.5">
-                <Lamp status={s} className="size-2" /> {label}
+                <Lamp status={s} lang={lang} className="size-2" /> {label}
               </span>
             ))}
           </span>
         </div>
         {selected.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
-            {untranslated > 0 && <span className="text-xs text-wait">{untranslated} bản chưa dịch xong</span>}
+            {untranslated > 0 && <span className="text-xs text-wait">{t.tracker.untranslated(untranslated)}</span>}
             <a href={`/admin/export?week=${week}&lang=vi`} className={buttonClass("outline", "sm")}>
               <FileDown className="size-4" /> DOCX (VN)
             </a>
@@ -99,8 +103,8 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
 
       {people.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">
-          Chưa có nhân viên nào cần nộp báo cáo.{" "}
-          <Link href="/admin/employees" className="font-medium text-brand underline">Thêm nhân viên</Link>
+          {t.tracker.noStaff}{" "}
+          <Link href="/admin/employees" className="font-medium text-brand underline">{t.tracker.addStaff}</Link>
         </p>
       ) : (
         <div className="overflow-x-auto rounded-2xl bg-surface shadow-card">
@@ -108,7 +112,7 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
             <thead>
               <tr className="border-b border-line">
                 <th className="sticky left-0 z-10 bg-surface px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-faint">
-                  Nhân viên
+                  {t.tracker.employee}
                 </th>
                 {weeks.map((w, i) => {
                   const due = dayInWeek(w, deadline.dueDay);
@@ -116,9 +120,9 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                     <th key={w} className={cn("px-2 py-3 text-center font-normal", w === week && "bg-brand-soft", older(i))}>
                       <Link href={`/admin?week=${w}`} className="block leading-tight hover:text-brand">
                         <div className={cn("text-sm font-semibold tabular-nums", w === week ? "text-brand" : "text-ink")}>
-                          {WEEKDAYS_VI[deadline.dueDay].replace("Thứ ", "T")} {shortDate(due)}
+                          {weekdayShort(deadline.dueDay, lang)} {shortDate(due, lang)}
                         </div>
-                        <div className="text-[11px] text-faint">Tuần {weekNumber(w)}{w === thisWeek && " · nay"}</div>
+                        <div className="text-[11px] text-faint">{t.common.week(weekNumber(w))}{w === thisWeek && ` · ${t.tracker.thisWeek}`}</div>
                       </Link>
                     </th>
                   );
@@ -140,9 +144,9 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                     }
                     const inner = (
                       <>
-                        <Lamp status={!r ? "missing" : isLate(r) ? "late" : "on-time"} />
+                        <Lamp status={!r ? "missing" : isLate(r) ? "late" : "on-time"} lang={lang} />
                         <span className={cn("text-[11px] tabular-nums", !r ? "text-faint" : isLate(r) ? "font-semibold text-wait" : "text-muted")}>
-                          {r ? formatSubmitted(r.submittedAt).replace(/^.*?, /, "") : "—"}
+                          {r ? formatSubmittedShort(r.submittedAt, lang) : "—"}
                         </span>
                       </>
                     );
@@ -151,7 +155,7 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
                         {r ? (
                           <Link
                             href={`/admin/reports/${r.id}`}
-                            title={`Xem báo cáo · ${isLate(r) ? "nộp trễ" : "nộp"} ${formatSubmitted(r.submittedAt)}`}
+                            title={t.tracker.viewReport(isLate(r), formatSubmitted(r.submittedAt, lang))}
                             className={cn("mx-auto flex w-fit flex-col items-center gap-1 rounded-md px-2 py-1", isLate(r) ? "hover:bg-wait-soft" : "hover:bg-go-soft")}
                           >
                             {inner}
@@ -167,7 +171,7 @@ export default async function TrackerPage({ searchParams }: PageProps<"/admin">)
             </tbody>
             <tfoot>
               <tr className="border-t border-line text-xs text-muted">
-                <td className="sticky left-0 z-10 bg-surface px-4 py-2.5">Đã nộp</td>
+                <td className="sticky left-0 z-10 bg-surface px-4 py-2.5">{t.tracker.total}</td>
                 {weeks.map((w, i) => (
                   <td key={w} className={cn("px-2 py-2.5 text-center tabular-nums", w === week && "bg-brand-soft/50 font-semibold text-brand", older(i))}>
                     {people.filter((p) => byKey.has(`${p.id}|${w}`)).length}/{people.filter((p) => byKey.has(`${p.id}|${w}`) || addWeeks(w, 1) > todayVN(p.createdAt)).length}
