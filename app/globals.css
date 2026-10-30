@@ -75,6 +75,105 @@ select:not([multiple]) {
   background-size: 1rem;
 }
 
+/* ── Day/night theme switch ───────────────────────── */
+.dn-toggle {
+  display: grid;
+  place-items: center;
+  padding: 5px 4px; /* 36px tall hit area around the 26px track */
+  border-radius: 9999px;
+}
+.dn-track {
+  position: relative;
+  display: block;
+  width: 52px;
+  height: 26px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #3e9ef5, #8fd0ff);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.3);
+}
+/* Night sky fades in over the day sky (gradients can't transition directly). */
+.dn-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0a1230, #24345f);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.dn-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ffcd3c;
+  /* Soft halo rings around the sun / moon. */
+  box-shadow:
+    0 0 0 4px rgb(255 255 255 / 0.16),
+    0 0 0 8px rgb(255 255 255 / 0.09),
+    0 0 0 12px rgb(255 255 255 / 0.05),
+    0 2px 4px rgb(0 0 0 / 0.25),
+    inset -2px -2px 3px rgb(0 0 0 / 0.12);
+  transition:
+    transform 550ms cubic-bezier(0.56, 1.35, 0.52, 1),
+    background-color 500ms ease;
+}
+.dn-toggle:hover .dn-knob {
+  transform: translateX(2px);
+}
+.dn-crater {
+  position: absolute;
+  border-radius: 9999px;
+  background: #c3c7d3;
+  box-shadow: inset 1px 1px 1px rgb(0 0 0 / 0.12);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.dn-cloud {
+  position: absolute;
+  right: 9px;
+  bottom: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 8px -3px 0 1px #fff, -9px 2px 0 0 #fff, 15px 2px 0 -1px #fff;
+  transition: transform 500ms ease, opacity 400ms ease;
+}
+.dn-cloud-back {
+  right: 5px;
+  bottom: 1px;
+  background: rgb(255 255 255 / 0.5);
+  box-shadow: 8px -3px 0 1px rgb(255 255 255 / 0.5), -9px 2px 0 0 rgb(255 255 255 / 0.5);
+}
+.dn-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 9999px;
+  background: #fff;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: transform 500ms ease, opacity 400ms ease;
+}
+
+[data-theme="dark"] .dn-track::before { opacity: 1; }
+[data-theme="dark"] .dn-knob { transform: translateX(26px) rotate(-40deg); background-color: #e6e8ef; }
+[data-theme="dark"] .dn-toggle:hover .dn-knob { transform: translateX(24px) rotate(-40deg); }
+[data-theme="dark"] .dn-crater { opacity: 1; }
+[data-theme="dark"] .dn-cloud { transform: translateY(18px); opacity: 0; }
+[data-theme="dark"] .dn-star {
+  opacity: 1;
+  transform: none;
+  animation: dn-twinkle 2.4s ease-in-out infinite alternate;
+}
+[data-theme="dark"] .dn-star:nth-child(2n) { animation-delay: -1.2s; }
+@keyframes dn-twinkle {
+  to { opacity: 0.35; }
+}
+
 /* Native <dialog> fade/scale in. */
 dialog[open] {
   animation: pop-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);

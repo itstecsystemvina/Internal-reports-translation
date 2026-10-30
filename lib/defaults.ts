@@ -17,7 +17,7 @@ export type AppSettings = {
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  translation: { model: "gemini-flash-latest", temperature: 0.2, systemPrompt: DEFAULT_SYSTEM_PROMPT },
+  translation: { model: "gemini-flash-latest", temperature: 0, systemPrompt: DEFAULT_SYSTEM_PROMPT },
   defaultCategories: ["Công việc liên quan đến S-Tec System", "Công việc liên quan đến BCCV"],
   defaultPassword: "",
   deadline: { openDay: 4, dueDay: 5, dueTime: "23:59" },

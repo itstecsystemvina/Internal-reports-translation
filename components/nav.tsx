@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const ADMIN = [
@@ -56,7 +55,7 @@ export function ThemeToggle() {
       type="button"
       aria-label="Đổi giao diện sáng/tối"
       title="Đổi giao diện sáng/tối"
-      className="grid size-9 place-items-center rounded-lg text-muted transition hover:bg-ink/[0.06] hover:text-ink active:scale-95"
+      className="dn-toggle"
       onClick={() => {
         const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
         document.documentElement.dataset.theme = next;
@@ -65,8 +64,20 @@ export function ThemeToggle() {
         } catch {}
       }}
     >
-      <Moon className="size-4 dark:hidden" />
-      <Sun className="hidden size-4 dark:block" />
+      {/* Day: sun + clouds on blue sky. Night: the sun rolls right into a moon, stars appear. Styles in globals.css. */}
+      <span className="dn-track" aria-hidden>
+        <span className="dn-star" style={{ left: 7, top: 6 }} />
+        <span className="dn-star" style={{ left: 15, top: 15 }} />
+        <span className="dn-star" style={{ left: 22, top: 6 }} />
+        <span className="dn-star" style={{ left: 9, top: 19 }} />
+        <span className="dn-cloud dn-cloud-back" />
+        <span className="dn-cloud" />
+        <span className="dn-knob">
+          <span className="dn-crater" style={{ left: 5, top: 4, width: 5, height: 5 }} />
+          <span className="dn-crater" style={{ left: 11, top: 10, width: 4, height: 4 }} />
+          <span className="dn-crater" style={{ left: 4, top: 12, width: 3, height: 3 }} />
+        </span>
+      </span>
     </button>
   );
 }
