@@ -1,9 +1,9 @@
 /**
  * Formats typing into DD/MM as the user goes: "2110" → "21/10", "56" → "5/6".
  * A day starting with 4–9 or a month starting with 2–9 can only be one digit.
+ * A multi-day task can be entered as a range: "DD/MM-DD/MM", e.g. "20/10-24/10".
  */
-export function formatDayMonth(raw: string) {
-  const s = raw.replace(/[^\d/]/g, "");
+function formatOneDayMonth(s: string) {
   if (s.includes("/")) {
     const [d, m = ""] = s.split("/");
     return `${d.slice(0, 2)}/${m.slice(0, 2)}`;
@@ -15,18 +15,38 @@ export function formatDayMonth(raw: string) {
   return m ? `${d}/${m}` : d;
 }
 
-/** Pads to DD/MM when complete: "5/6" → "05/06". Leaves incomplete input alone. */
-export function padDayMonth(value: string) {
+export function formatDayMonth(raw: string) {
+  const s = raw.replace(/[^\d/-]/g, "");
+  const dashIndex = s.indexOf("-");
+  if (dashIndex === -1) return formatOneDayMonth(s);
+  return `${formatOneDayMonth(s.slice(0, dashIndex))}-${formatOneDayMonth(s.slice(dashIndex + 1).replace(/-/g, ""))}`;
+}
+
+/** Pads to DD/MM when complete: "5/6" → "05/06". Leaves incomplete input alone. Also pads each side of a DD/MM-DD/MM range. */
+function padOneDayMonth(value: string) {
   const match = /^(\d{1,2})\/(\d{1,2})$/.exec(value);
   return match ? `${match[1].padStart(2, "0")}/${match[2].padStart(2, "0")}` : value;
 }
 
-export function isValidDayMonth(value: string) {
-  if (!value) return true;
+export function padDayMonth(value: string) {
+  if (!value.includes("-")) return padOneDayMonth(value);
+  const [start, end] = value.split("-");
+  return `${padOneDayMonth(start)}-${padOneDayMonth(end)}`;
+}
+
+function isValidOneDayMonth(value: string) {
   const match = /^(\d{1,2})\/(\d{1,2})$/.exec(value);
   if (!match) return false;
   const [d, m] = [Number(match[1]), Number(match[2])];
   return d >= 1 && d <= 31 && m >= 1 && m <= 12;
+}
+
+/** A single "DD/MM" date, or a "DD/MM-DD/MM" range for a task spanning several days. */
+export function isValidDayMonth(value: string) {
+  if (!value) return true;
+  if (!value.includes("-")) return isValidOneDayMonth(value);
+  const [start, end] = value.split("-");
+  return isValidOneDayMonth(start) && isValidOneDayMonth(end);
 }
 
 /** True when any task in the report has a date that isn't a valid DD/MM. */

@@ -12,7 +12,7 @@ const SIDES: Side[] = ["currentWeek", "nextWeek"];
 
 const field =
   "h-9 w-full rounded-lg border border-transparent bg-fill px-2.5 text-sm text-ink transition placeholder:text-faint focus:border-brand focus:bg-surface focus:outline-none focus:ring-4 focus:ring-brand/15";
-const COLS = "md:grid-cols-[minmax(0,1fr)_92px_170px_84px_32px]";
+const COLS = "md:grid-cols-[minmax(0,1fr)_128px_150px_84px_32px]";
 
 /** Editable report: groups of tasks for this week and next week. `lang` is the language of the content. */
 export function ReportEditor({
@@ -117,13 +117,14 @@ function SectionCard({
             <button type="button" onClick={() => onRemoveTask(ti)} title={L.editor.removeRow} aria-label={L.editor.removeRow} className="col-start-2 row-start-1 grid size-9 place-items-center rounded-lg text-faint transition hover:bg-stop-soft hover:text-stop active:scale-95 md:col-start-5">
               <X className="size-4" />
             </button>
-            <div className="col-span-2 grid grid-cols-[92px_minmax(0,1fr)_84px] gap-2 md:contents">
+            <div className="col-span-2 grid grid-cols-[128px_minmax(0,1fr)_84px] gap-2 md:contents">
               <input
                 value={t.date}
                 onChange={(e) => onTask(ti, { date: formatDayMonth(e.target.value) })}
                 onBlur={(e) => onTask(ti, { date: padDayMonth(e.target.value) })}
                 inputMode="numeric"
                 placeholder="DD/MM"
+                title={L.editor.dateAria}
                 aria-label={L.editor.dateAria}
                 aria-invalid={!isValidDayMonth(t.date)}
                 className={cn(field, "tabular-nums md:col-start-2 md:row-start-1", !isValidDayMonth(t.date) && "border-stop! focus:ring-stop/15")}
