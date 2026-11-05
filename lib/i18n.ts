@@ -105,6 +105,7 @@ const vi = {
     translateFailed: "Dịch thất bại",
     queued: "Chờ hạn nộp",
     queuedKo: "Sẽ tự dịch sau hạn nộp. Bấm “Dịch lại” để dịch ngay.",
+    writeTranslation: "Nhập bản dịch",
   },
   translator: {
     button: "Dịch",
@@ -339,6 +340,7 @@ const ko: Dict = {
     translateFailed: "번역 실패",
     queued: "마감 대기",
     queuedKo: "마감 후 자동 번역됩니다. “다시 번역”을 누르면 바로 번역합니다.",
+    writeTranslation: "번역 입력",
   },
   translator: {
     button: "번역",

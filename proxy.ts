@@ -6,7 +6,9 @@ export async function proxy(request: NextRequest) {
   const signedIn = !!(await verifySession(request.cookies.get(SESSION_COOKIE)?.value));
   const { pathname } = request.nextUrl;
   // Scheduled jobs check their own secret.
-  if (pathname === "/logout" || pathname.startsWith("/api/cron/")) return NextResponse.next();
+  if (pathname === "/logout" || pathname.startsWith("/api/cron/") || pathname === "/api/export") {
+    return NextResponse.next();
+  }
   const isLogin = pathname === "/login";
   if (!signedIn && !isLogin) return NextResponse.redirect(new URL("/login", request.url));
   if (signedIn && isLogin) return NextResponse.redirect(new URL("/", request.url));

@@ -13,3 +13,6 @@ legacy
 *.xls
 *.csv
 .claude
+# Windows download script settings (contains the encrypted export key) and its log
+scripts/windows/config.json
+scripts/windows/download-log.txt

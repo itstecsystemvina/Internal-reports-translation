@@ -20,12 +20,27 @@ Built with Next.js, Neon Postgres and Google Gemini.
    | `SESSION_SECRET` | A long random string. Generate one with `openssl rand -base64 32`. |
    | `GEMINI_API_KEY` | A key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey). |
    | `CRON_SECRET` | A long random string. Protects the daily translation job (runs 00:05 Vietnam time and translates reports whose deadline has passed). |
+   | `EXPORT_SECRET` | Optional. A long random string for automatic weekly downloads (see below). |
    | `DEFAULT_PASSWORD` | Starting password for the first admin and for new employees (at least 6 characters). Keep it out of the repository and share it with staff privately. |
 
 4. **Redeploy** (Deployments → ⋯ → Redeploy). Each deploy creates or updates the database tables and makes sure the default admin exists.
 5. Sign in as **tunglam@stecsystem.com.vn** with the `DEFAULT_PASSWORD` you set, then change your password under **Đổi mật khẩu**.
 6. Open **Nhân viên → Nhập từ Excel**, choose the staff list (.xlsx), pick the sheet, check the preview and import. Only name, email, department and position are read; nothing else in the file is stored.
 7. Open **Cài đặt** and press **Dịch thử** to check that translation works.
+
+## Weekly backup to a Windows computer
+
+A Windows PC can download each week's Vietnamese and Korean Word files on its own, every Saturday at 08:00.
+
+1. Set `EXPORT_SECRET` in Vercel (see the table above) and redeploy.
+2. Copy the `scripts/windows` folder to the PC, for example to `C:\BCCV`.
+3. Double-click `install.cmd`. Enter the site address, the `EXPORT_SECRET` value and a folder (default: `Documents\BCCV Reports`). It creates the scheduled task **BCCV weekly reports** and downloads once as a test.
+
+Files are saved as `<year>\<Monday of the week>_BCCV_STEC(VN).docx` and `...(Kr).docx`. Each run saves the week that just closed and downloads the week before again, so late reports are included. If the PC was off on Saturday, the task runs when it is next on. Results go to `download-log.txt` next to the scripts.
+
+- Saturday 08:00 is the PC's own clock, so set the PC to Vietnam time. The Windows user must be signed in (a locked screen is fine).
+- The key is stored encrypted for that Windows user only. To change the key or folder, run `install.cmd` again.
+- Anyone with `EXPORT_SECRET` can download the reports. Keep it out of the repository; change it in Vercel (and re-run `install.cmd`) if it leaks.
 
 ## Accounts and passwords
 

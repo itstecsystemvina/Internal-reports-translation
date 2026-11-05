@@ -113,9 +113,9 @@ export function Review({
             <Button variant="ghost" size="sm" onClick={redo} disabled={pending}>
               <RefreshCw className={`size-3.5 ${pending ? "animate-spin" : ""}`} /> {t.review.retranslate}
             </Button>
-            {translation && (
-              <Button variant="ghost" size="sm" onClick={() => edit("ko")}><Pencil className="size-3.5" /> {t.common.edit}</Button>
-            )}
+            <Button variant="ghost" size="sm" onClick={() => edit("ko")}>
+              <Pencil className="size-3.5" /> {translation ? t.common.edit : t.review.writeTranslation}
+            </Button>
           </>
         }
       >
